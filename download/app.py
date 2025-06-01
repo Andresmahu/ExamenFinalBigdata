@@ -23,7 +23,7 @@ def download_and_save_to_s3(site_name, url):
 
 
         s3 = boto3.client('s3')
-        key = f'headlines/raw/{site_name}/{datetime.now().strftime("%Y/%m/%d/%H%M%S")}.html'
+        key = f'headlines/raw/{site_name}-{datetime.now().strftime("%Y-%m-%d")}.html'
         s3.put_object(
             Bucket=BUCKET_NAME,
             Key=key,
