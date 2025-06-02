@@ -12,6 +12,19 @@
         "profile_name": "default",
         "project_name": "crawler",
         "runtime": "python3.10",
-        "s3_bucket": "zappa-qsdp4t21n"
+        "s3_bucket": "zappa-qsdp4t21n",
+        "apigateway_enabled": false,
+        "manage_roles": false,
+        "role_name": "LabRole",
+        "events": [
+            {
+                "function": "app.lambda_handler",
+                "expression": "cron(31 17 * * ? *)"
+            }
+        ],
+        "keep_warm": false,
+        "environment_variables": {
+            "GLUE_CRAWLER_NAME": "crawler_porfavorcito_sirve" // <<-- Name of your Glue Crawler
+        },
     }
 }
