@@ -5,6 +5,7 @@ import csv
 from bs4 import BeautifulSoup
 import re
 from datetime import datetime
+import unicodedata
 
 s3 = boto3.client('s3')
 
@@ -47,15 +48,19 @@ def lambda_handler(event, context):
                 if not t or not a:
                     continue
                 titular = t.get_text(strip=True)
+                texto_nfd = unicodedata.normalize('NFD', titular)
+                titular_sin_tildes = re.sub(r'[\u0300-\u036f]', '', texto_nfd)
+                titulo_sin_caracteres = re.sub(r'[^A-Za-z0-9\s]', '', titular_sin_tildes)
+                titular_final = re.sub(r",", " ", titulo_sin_caracteres)
                 enlace = a['href']
-                
+            
                 if not enlace.startswith('http'):
                     enlace = base_url + enlace
                 parts = enlace.split('/')
                 categoria = parts[3] if len(parts) > 3 else ''
                 noticias.append({
                     'categoria': categoria,
-                    'titular': titular,
+                    'titular': titular_final,
                     'enlace': enlace
                 })
             periodico='eltiempo'
@@ -68,6 +73,10 @@ def lambda_handler(event, context):
                 if not a:
                     continue
                 titular = t.get_text(strip=True)
+                texto_nfd = unicodedata.normalize('NFD', titular)
+                titular_sin_tildes = re.sub(r'[\u0300-\u036f]', '', texto_nfd)
+                titulo_sin_caracteres = re.sub(r'[^A-Za-z0-9\s]', '', titular_sin_tildes)
+                titular_final = re.sub(r",", " ", titulo_sin_caracteres)
                 enlace = a['href']
                 
                 if not enlace.startswith('http') and base_url:
@@ -77,7 +86,7 @@ def lambda_handler(event, context):
                 categoria = parts[3] if len(parts) > 3 else ''
                 noticias.append({
                     'categoria': categoria,
-                    'titular': titular,
+                    'titular': titular_final,
                     'enlace': enlace
                 })
             periodico='publimetro'
@@ -88,18 +97,12 @@ def lambda_handler(event, context):
         
         # 4. Crear un CSV en memoria con las noticias
         csv_buffer = io.StringIO()
-        escritor = csv.writer(csv_buffer)
-        
-        # 4.1. Escribir header
-        escritor.writerow(['categoria', 'titular', 'enlace'])
-        
-        # 4.2. Escribir cada fila
+        escritor = csv.DictWriter(csv_buffer,fieldnames=['categoria', 'titular', 'enlace'])
+        escritor.writeheader()
         for noticia in noticias:
-            escritor.writerow([noticia['categoria'], noticia['titular'], noticia['enlace']])
+            escritor.writerow(noticia)
         
-        # 5. Definir destino para el CSV (puede ser el mismo bucket, otra carpeta, etc.)
-        #    Ejemplo: cambiar extensión .html por .csv y guardarlo en carpeta "procesados/"
-        csv_key = f'headlines/final/periodico={periodico}/{datetime.now().strftime("%Y/%m/%d/%H%M%S")}.csv' 
+        csv_key = f'headlines/final/periodico={periodico}/{datetime.now().strftime("year=%Y/month=%m/day=%d")}/{periodico}.csv'
         
         try:
             # 6. Subir el CSV a S3
