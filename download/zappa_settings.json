@@ -19,7 +19,7 @@
         "events": [
             {
                 "function": "app.lambda_handler",
-                "expression": "cron(28 0 * * ? *)"
+                "expression": "cron(8 17 * * ? *)"
             }
         ],
         "timeout_seconds": 300,

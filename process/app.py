@@ -59,9 +59,9 @@ def lambda_handler(event, context):
                 parts = enlace.split('/')
                 categoria = parts[3] if len(parts) > 3 else ''
                 noticias.append({
-                    'categoria': categoria,
-                    'titular': titular_final,
-                    'enlace': enlace
+                    'Categoria': categoria,
+                    'Titular': titular_final,
+                    'Enlace': enlace
                 })
             periodico='eltiempo'
         elif re.search(r'(?i)\bpublimetro\b', object_key):
@@ -85,9 +85,9 @@ def lambda_handler(event, context):
                 parts = enlace.split('/')
                 categoria = parts[3] if len(parts) > 3 else ''
                 noticias.append({
-                    'categoria': categoria,
-                    'titular': titular_final,
-                    'enlace': enlace
+                    'Categoria': categoria,
+                    'Titular': titular_final,
+                    'Enlace': enlace
                 })
             periodico='publimetro'
         else:
@@ -97,7 +97,7 @@ def lambda_handler(event, context):
         
         # 4. Crear un CSV en memoria con las noticias
         csv_buffer = io.StringIO()
-        escritor = csv.DictWriter(csv_buffer,fieldnames=['categoria', 'titular', 'enlace'])
+        escritor = csv.DictWriter(csv_buffer,fieldnames=['Categoria', 'Titular', 'Enlace'])
         escritor.writeheader()
         for noticia in noticias:
             escritor.writerow(noticia)
