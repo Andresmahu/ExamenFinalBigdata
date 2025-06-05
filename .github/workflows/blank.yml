@@ -76,16 +76,19 @@ jobs:
       - name: Update download
         working-directory: download
         run: |
+          source ../.venv/bin/activate
           zappa update dev
     
       - name: Update process
         working-directory: process
         run: |
+          source ../.venv/bin/activate
           zappa update dev
           
       - name: Update crawler
         working-directory: crawler
         run: |
+          source ../.venv/bin/activate
           zappa update dev
 
       
